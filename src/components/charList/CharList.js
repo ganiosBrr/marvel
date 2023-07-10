@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types'
 import Spinner from '../spinner/spinner';
-import Marvelservice from '../../services/MarvelService';
+import useMarvelservice from '../../services/MarvelService';
 import ErrorMessage from '../../errorMessage/errorMessage';
 
 import './charList.scss';
@@ -9,28 +9,23 @@ import './charList.scss';
 const CharList = ({onCharSelected, selectedChar}) => {
 
     const [chars, setChars] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
     const [newCharLoading, setNewCharLoading] = useState(false);
     const [offset, setOffset] = useState(210);
     const [charEnded, setCharEnded] = useState(false);
 
-    const marvelService = new Marvelservice();
+    const {loading, error, getAllCharacters} = useMarvelservice();
+    //используем кастомный хук для оптимизации и избавления повторящегося и не нужного кода 
+    //таких как loading и error и ненужных методов которые меняют их состояние
+    //так как их состояние меняется хуком
 
     useEffect(() => {
-        onRequest();
-    }, [])
+        onRequest(offset, true);
+    }, []);
 
-    const onRequest = (offset) => {
-        onNewCharLoading()
-        marvelService
-            .getAllCharacters(offset)
-            .then(data => onCharsLoaded(data))
-            .catch(onError)
-    }
-
-    const onNewCharLoading = () => {
-        setNewCharLoading(true);
+    const onRequest = (offset, initial) => {
+        initial ? setNewCharLoading(false) : setNewCharLoading(true); 
+        getAllCharacters(offset)
+            .then(data => onCharsLoaded(data));
     }
 
     const onCharsLoaded = (newCharList) => {
@@ -41,16 +36,9 @@ const CharList = ({onCharSelected, selectedChar}) => {
         }
 
         setChars((chars) => [...chars, ...newCharList]);
-        setLoading(loading => false);
         setNewCharLoading(newCharLoading => false);
         setOffset((offset) => offset + 9);
         setCharEnded((charEnded) => ended);
-
-    }
-
-    const onError = () => {
-        setLoading(loading => false);
-        setError(true);
     }
 
     //метод в основном для оптимизации для того
@@ -83,16 +71,16 @@ const CharList = ({onCharSelected, selectedChar}) => {
         );
     } 
 
+    const items = renderItems(chars);
     
-    //const {chars, loading, newCharLoading, error, offset, charEnded} = this.state;
-    const spinner = loading ? <Spinner/> : null;
+    const spinner = loading && !newCharLoading ? <Spinner/> : null;
     const errorMessage = error ? <ErrorMessage/> : null;
-    const content = !(loading || error) ? renderItems(chars) : null;
+
     return (
         <div className="char__list">  
             {spinner}
             {errorMessage}
-            {content}
+            {items}
             <button 
                 className="button button__main button__long"
                 disabled={newCharLoading} 

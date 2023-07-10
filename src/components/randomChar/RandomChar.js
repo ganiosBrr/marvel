@@ -1,70 +1,60 @@
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
 import { useState, useEffect } from 'react';
-import Marvelservice from '../../services/MarvelService';
 import Spinner from '../spinner/spinner';
 import ErrorMessage from '../../errorMessage/errorMessage';
+import useMarvelservice from '../../services/MarvelService';
 
 const RandomChar = () => {
     const [char, setChar] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(false);
 
-
-    const marvelService = new Marvelservice();
+    const {loading, error, getCharacter, clearError} = useMarvelservice();
 
     useEffect(() => {
         updateChar();
     },[]);
 
     const onCharLoaded = (char) => { 
-        setLoading(loading => false);
         setChar(char);
     }
 
-    const onError = () => {
-        setLoading(loading => false);
-        setError(error => true);
-    }
-
-    const onCharLoading = () => {
-        setLoading(loading => true);
-    }
-
     const updateChar = () => {
+        clearError(); //отчистка ошибки при каждом запросе.
+        //если вдруг сервер вернет несуществующего героя,
+        //можно было кликом на Try it еще раз сделать новый запрос.
+        //иначе если бы запрос вернул ошибку, мы не смогли сделать новый клик (запрос)
+
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
-        onCharLoading();
-        marvelService
-            .getCharacter(id)
-            .then(onCharLoaded)
-            .catch(onError);
+        getCharacter(id)
+            .then(onCharLoaded);
     }
 
+    const errorMessage = error ? <ErrorMessage/> : null;
+    const spinner = loading ? <Spinner/> : null;
+    const content = !( loading || errorMessage || !char) ? <View char={char}/> : null; 
+    //проверяем что char не null, так как данные в нем появляются не сразу
+    //и чтобы не передавать в View значение null
 
-        const errorMessage = error ? <ErrorMessage/> : null;
-        const spinner = loading ? <Spinner/> : null;
-        const content = !( loading || errorMessage || !char) ? <View char={char}/> : null; 
-
-        return (
-            <div className="randomchar">
-                {errorMessage}
-                {spinner}
-                {content}
-                <div className="randomchar__static">
-                    <p className="randomchar__title">
-                        Random character for today!<br/>
-                        Do you want to get to know him better?
-                    </p>
-                    <p className="randomchar__title">
-                        Or choose another one
-                    </p>
-                    <button className="button button__main" onClick={updateChar}>
-                        <div className="inner">try it</div>
-                    </button>
-                    <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
-                </div>
+    return (
+        <div className="randomchar">
+            {errorMessage}
+            {spinner}
+            {content}
+            <div className="randomchar__static">
+                <p className="randomchar__title">
+                    Random character for today!<br/>
+                    Do you want to get to know him better?
+                </p>
+                <p className="randomchar__title">
+                    Or choose another one
+                </p>
+                <button className="button button__main" onClick={updateChar}>
+                    <div className="inner">try it</div>
+                </button>
+                <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
             </div>
-        )
+        </div>
+    )
 }
 
 //разделили компонент на логический (Spinner) и компонент для рендера (View)
