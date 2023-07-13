@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
 import "./comicsList.scss";
 import Spinner from "../spinner/spinner";
 import ErrorMessage from "../../errorMessage/errorMessage";
-import { useEffect, useState } from "react";
 import useMarvelservice from "../../services/MarvelService";
 
 const ComicsList = ({ onCharSelected, selectedChar }) => {
@@ -36,11 +38,11 @@ const ComicsList = ({ onCharSelected, selectedChar }) => {
 
   function renderComics(arr) {
     const items = arr.map((item, i) => {
-      const { thumbnail, title, price } = item;
+      const { id, thumbnail, title, price } = item;
 
       return (
         <li className="comics__item" key={i}>
-          <a href="#">
+          <Link to={`/comics/${id}`}>
             <img
               src={thumbnail}
               alt="ultimate war"
@@ -48,7 +50,7 @@ const ComicsList = ({ onCharSelected, selectedChar }) => {
             />
             <div className="comics__item-name">{title}</div>
             <div className="comics__item-price">{price}</div>
-          </a>
+          </Link>
         </li>
       );
     });

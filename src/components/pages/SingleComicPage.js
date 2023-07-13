@@ -1,22 +1,23 @@
-import "./singleComic.scss";
+import "./singleComicPage.scss";
 import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import useMarvelservice from "../../services/MarvelService";
 import ErrorMessage from "../../errorMessage/errorMessage";
 import Spinner from "../spinner/spinner";
 
-const SingleComic = ({ selectedChar }) => {
+const SingleComicPage = () => {
+  const { comicId } = useParams();
   const [comic, setComic] = useState(null);
   const { loading, error, getSingleComic, clearError } = useMarvelservice();
 
   useEffect(() => {
     updateComic();
-  }, []);
+  }, [comicId]);
 
   const updateComic = () => {
     clearError();
-
-    const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
-    getSingleComic(id).then(onComicLoaded);
+    getSingleComic(comicId)
+        .then(onComicLoaded);
   };
 
   const onComicLoaded = (comic) => {
@@ -35,9 +36,9 @@ const SingleComic = ({ selectedChar }) => {
       {spinner}
       {errorMessage}
       {content}
-      <a href="#" className="single-comic__back">
+      <Link to={"/comics"} className="single-comic__back">
         Back to all
-      </a>
+      </Link>
     </div>
   );
 };
@@ -68,4 +69,4 @@ const View = ({ comic }) => {
   );
 };
 
-export default SingleComic;
+export default SingleComicPage;

@@ -42,7 +42,7 @@ const CharList = ({ onCharSelected, selectedChar }) => {
   //метод в основном для оптимизации для того
   //чтобы не помещать такое в рендер
   function renderItems(arr) {
-    const items = arr.map((item) => {
+    const items = arr.map((item, i) => {
       const { thumbnail, name } = item;
       let imgStyle = { objectFit: "cover" };
       if (
@@ -55,7 +55,7 @@ const CharList = ({ onCharSelected, selectedChar }) => {
       return (
         <li
           className={`char__item ${isSelected}`}
-          key={item.id}
+          key={i}
           onClick={() => onCharSelected(item.id)}
         >
           <img src={thumbnail} alt="abyss" style={imgStyle} />
