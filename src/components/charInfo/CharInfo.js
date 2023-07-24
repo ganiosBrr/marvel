@@ -7,6 +7,7 @@ import ErrorMessage from "../../errorMessage/errorMessage";
 import Skeleton from "../skeleton/Skeleton";
 
 import "./charInfo.scss";
+import { Link } from "react-router-dom";
 
 const CharInfo = ({ selectedChar }) => {
   const [char, setChar] = useState(null);
@@ -49,7 +50,7 @@ const CharInfo = ({ selectedChar }) => {
 };
 
 const View = ({ char }) => {
-  const { name, description, thumbnail, homepage, wiki, comics } = char;
+  const { id, name, description, thumbnail, homepage, wiki, comics } = char;
   let imgStyle = { objectFit: "cover" };
   if (
     thumbnail ===
@@ -81,9 +82,11 @@ const View = ({ char }) => {
           // eslint-disable-next-line array-callback-return
           if (i > 10) return;
           return (
-            <li className="char__comics-item" key={i}>
-              {item.name}
-            </li>
+            <Link to={`/comics/${item.resourceURI.substring(43)}`}>
+              <li className="char__comics-item" key={i}>
+                {item.name}
+              </li>
+            </Link>
           );
         })}
       </ul>

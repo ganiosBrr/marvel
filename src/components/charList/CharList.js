@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { Transition, TransitionGroup } from "react-transition-group";
+
 import Spinner from "../spinner/spinner";
 import useMarvelservice from "../../services/MarvelService";
 import ErrorMessage from "../../errorMessage/errorMessage";
@@ -11,6 +13,20 @@ const CharList = ({ onCharSelected, selectedChar }) => {
   const [newCharLoading, setNewCharLoading] = useState(false);
   const [offset, setOffset] = useState(210);
   const [charEnded, setCharEnded] = useState(false);
+
+  const duration = 500;
+
+  const defaultStyle = {
+    transition: `opacity ${duration}ms ease-in-out`,
+    opacity: 1
+  }
+
+  const transitionStyles = {
+    entering: { opacity: 0,},
+    entered:  { opacity: 1,},
+    exiting:  { opacity: 1,},
+    exited:  { opacity: 1,},
+  };
 
   const { loading, error, getAllCharacters } = useMarvelservice();
   //используем кастомный хук для оптимизации и избавления повторящегося и не нужного кода
@@ -53,19 +69,33 @@ const CharList = ({ onCharSelected, selectedChar }) => {
       }
       const isSelected = selectedChar === item.id ? "selected" : "";
       return (
-        <li
-          className={`char__item ${isSelected}`}
-          key={i}
-          onClick={() => onCharSelected(item.id)}
-        >
-          <img src={thumbnail} alt="abyss" style={imgStyle} />
-          <div className="char__name">{name}</div>
-        </li>
+        <Transition in={true} timeout={duration}>
+          { state => (
+            <li
+              className={`char__item ${isSelected}`}
+              key={i}
+              onClick={() => onCharSelected(item.id)}
+              style={{
+                ...defaultStyle,
+                ...transitionStyles[state]
+              }}
+            >
+              <img src={thumbnail} alt="abyss" style={imgStyle} />
+              <div className="char__name">{name}</div>
+            </li>)
+          }
+        </Transition>
       );
     });
 
     //это чтобы отцентрировать спиннеры
-    return <ul className="char__grid">{items}</ul>;
+    return (
+      <ul className="char__grid">
+        <TransitionGroup component={null}>
+          {items}
+        </TransitionGroup>
+      </ul>
+    );
   }
 
   const items = renderItems(chars);
