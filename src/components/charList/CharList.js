@@ -39,20 +39,20 @@ const CharList = ({ onCharSelected, selectedChar }) => {
 
   const onRequest = (offset, initial) => {
     initial ? setNewCharLoading(false) : setNewCharLoading(true);
-    getAllCharacters(offset).then((data) => onCharsLoaded(data));
+    getAllCharacters(offset).then(onCharsLoaded);
   };
 
-  const onCharsLoaded = (newCharList) => {
+  const onCharsLoaded = async (newCharList) => {
     let ended = false;
 
     if (newCharList.length < 9) {
       ended = true;
     }
 
-    setChars((chars) => [...chars, ...newCharList]);
-    setNewCharLoading((newCharLoading) => false);
+    setChars([...chars, ...newCharList]);
+    setNewCharLoading(false);
     setOffset((offset) => offset + 9);
-    setCharEnded((charEnded) => ended);
+    setCharEnded(ended);
   };
 
   //метод в основном для оптимизации для того
