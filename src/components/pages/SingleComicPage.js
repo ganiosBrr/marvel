@@ -1,6 +1,8 @@
 import "./singleComicPage.scss";
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
+
 import useMarvelservice from "../../services/MarvelService";
 import ErrorMessage from "../../errorMessage/errorMessage";
 import Spinner from "../spinner/spinner";
@@ -49,6 +51,13 @@ const View = ({ comic }) => {
 
   return (
     <>
+    <Helmet>
+        <meta
+          name="description"
+          content={`${title} comic book`}
+        />
+        <title>{title}</title>
+    </Helmet>
       <img
         src={thumbnail}
         alt="x-men"
